@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onlinejudge-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - "" # dev 환경의 도메인 이름
+      secretName: dev-example-tls
+  rules:
+    - host: "" # dev 환경의 도메인 이름
+      http:
+        paths:
+          - path: /dev
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-onlinejudge-front
+                port:
+                  number: 5173
+          - path: /dev/api
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-onlinejudge-back
+                port:
+                  number: 3000

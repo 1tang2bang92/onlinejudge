@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1 # Kubernetes에서 Ingress 리소스를 정의하는 API 버전
+kind: Ingress # 리소스 종류: Ingress
+metadata:
+  name: onlinejudge-ingress # Ingress 리소스의 이름
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Cert-Manager가 사용할 ClusterIssuer 이름을 지정
+spec:
+  tls:
+    - hosts:
+        - "" # 모든 호스트에 TLS를 적용
+      secretName: example-tls # TLS 인증서를 저장할 Secret의 이름
+  rules:
+    - host: "" # 모든 호스트에 대한 트래픽 규칙 정의
+      http:
+        paths:
+          - path: / # URL 경로, 루트 경로를 설정
+            pathType: Prefix # 경로 타입, Prefix는 주어진 경로로 시작하는 모든 경로에 대해 트래픽을 전달
+            backend:
+              service:
+                name: onlinejudge-front # 트래픽을 전달할 백엔드 서비스 이름
+                port:
+                  number: 80 # 백엔드 서비스의 포트 번호
+          - path: /api # URL 경로, /api로 시작하는 모든 요청을 처리
+            pathType: ImplementationSpecific # 경로 타입, URL 경로와의 정확한 매칭 방식이 클러스터에 따라 다를 수 있음
+            backend:
+              service:
+                name: onlinejudge-back # 트래픽을 전달할 백엔드 서비스 이름
+                port:
+                  number: 3000 # 백엔드 서비스의 포트 번호
+          - path: /dev # URL 경로, /dev로 시작하는 모든 요청을 처리
+            pathType: ImplementationSpecific # 경로 타입, URL 경로와의 정확한 매칭 방식이 클러스터에 따라 다를 수 있음
+            backend:
+              service:
+                name: dev-onlinejudge-front # 트래픽을 전달할 백엔드 서비스 이름
+                port:
+                  number: 5173 # 백엔드 서비스의 포트 번호
+          - path: /dev/api # URL 경로, /dev/api로 시작하는 모든 요청을 처리
+            pathType: ImplementationSpecific # 경로 타입, URL 경로와의 정확한 매칭 방식이 클러스터에 따라 다를 수 있음
+            backend:
+              service:
+                name: dev-onlinejudge-back # 트래픽을 전달할 백엔드 서비스 이름
+                port:
+                  number: 3000 # 백엔드 서비스의 포트 번호
